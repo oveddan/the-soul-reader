@@ -49,6 +49,7 @@
 		A9DC608D209564930041C512 /* soulReaderDebug.app */ = {isa = PBXFileReference; lastKnownFileType = wrapper.application; path = soulReaderDebug.app; sourceTree = "<group>"; };
 		A9DC608E209570990041C512 /* element.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = element.cpp; sourceTree = "<group>"; };
 		A9DC608F209570990041C512 /* element.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = element.hpp; sourceTree = "<group>"; };
+		A9DC60922096872D0041C512 /* focusBlur.frag */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = focusBlur.frag; sourceTree = "<group>"; };
 		E4328143138ABC890047C5CB /* openFrameworksLib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = openFrameworksLib.xcodeproj; path = ../../../libs/openFrameworksCompiled/project/osx/openFrameworksLib.xcodeproj; sourceTree = SOURCE_ROOT; };
 		E4B69B5B0A3A1756003C02F2 /* soulReaderDebug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = soulReaderDebug.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4B69E1D0A3A1BDC003C02F2 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = src/main.cpp; sourceTree = SOURCE_ROOT; };
@@ -83,6 +84,7 @@
 			children = (
 				A9DC60872095639A0041C512 /* wood.frag */,
 				A9DC6088209563A80041C512 /* wood.vert */,
+				A9DC60922096872D0041C512 /* focusBlur.frag */,
 			);
 			path = shaders;
 			sourceTree = "<group>";

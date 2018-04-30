@@ -18,11 +18,9 @@ public:
     Element(int x, int y): x(x), y(y) {};
     virtual void animate() {};
     virtual void render() = 0;
-    void updateAttention(bool intersects);
-    bool capturedFocus();
-    virtual Element* spawnSimilarElement(ofVec2f gaze) = 0;
-    void resetAttention();
-    virtual bool intersects(ofVec2f gaze) = 0;
+    bool updateAttention(bool intersects);
+    virtual Element* spawnSimilarElement(int gazeX, int gazeY) = 0;
+    virtual bool intersects(int gazeX, int gazeY) = 0;
     virtual ~Element() {}
     
     float weight;
@@ -36,23 +34,19 @@ protected:
 
 class ColorElement : public Element {
 public:
-    ColorElement(ofColor color, int x, int y, int w, int h): color(color),
-     w(w), h(h), Element(x, y) {};
+    ColorElement(ofColor color, int cx, int cy, int w, int h): color(color),
+    w(w), h(h), Element(cx -w/2, cy - h/2) {};
     
     void render();
-    Element* spawnSimilarElement(ofVec2f gaze);
-    bool intersects(ofVec2f gaze);
+    Element* spawnSimilarElement(int gazeX, int gazeY);
+    bool intersects(int gazeX, int gazeY);
     
     ofColor color;
-    
-    int l() { return x - w/2;}
-    int r() { return x + w/2;}
-    int t() { return y - h/2;}
-    int b() { return y + h/2;}
     
 protected:
     int w;
     int h;
+    ofRectangle rectangle;
     
 };
 

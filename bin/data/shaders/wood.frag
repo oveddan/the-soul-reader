@@ -4,7 +4,9 @@
 #version 150
 
 out vec4 outputColor;
+uniform sampler2DRect outputGraphic;
 
+in vec2 texCoordVarying;
 uniform vec2 u_resolution;
 uniform vec2 u_mouse;
 uniform float u_time;
@@ -54,5 +56,9 @@ void main() {
     // Draw lines
     pattern = lines(pos,.5);
     
-    outputColor = vec4(vec3(pattern),1.0);
+    vec3 src = texture(outputGraphic, texCoordVarying).rgb;
+    
+    vec3 result = src * pattern;
+    
+    outputColor = vec4(result,1.0);
 }

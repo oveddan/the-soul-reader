@@ -38,21 +38,21 @@ void ofApp::setup(){
     }
 }
 
-ofVec2f getGazeCoords() {
-    return ofVec2f(ofGetMouseX(), ofGetMouseY());
-}
 
 
-const int MAX_ELEMENTS = 80;
+const int MAX_ELEMENTS = 200;
 
-bool isValidGazeCoords(ofVec2f gazeCoords) {
+bool isValidGazeCoords(ofVec2f &gazeCoords) {
     return gazeCoords.x >= 0 && gazeCoords.x <= ofGetWidth() && gazeCoords.y >= 0 && gazeCoords.y <= ofGetHeight();
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
     int numberElements = elements.size();
-    ofVec2f gazeCoords = getGazeCoords();
+    
+    ofVec2f gazeCoords = ofVec2f(ofGetMouseX(), ofGetMouseY());
+    
+//    printf("gaze x, y, %i %i\n", ofGetMouseX(), ofGetMouseY());
     
     if (!isValidGazeCoords(gazeCoords))
         return;
@@ -61,24 +61,26 @@ void ofApp::update(){
     
     for(int i = 0; i < numberElements; i++) {
         Element* element = elements[i];
-        if (element->intersects(gazeCoords)) {
+        if (element->intersects(gazeCoords.x, gazeCoords.y)) {
             highestIntersect = std::max(i, highestIntersect);
         }
     }
     
     bool hasAddedElement = false;
     
-    printf("highest intersect: %i\n", highestIntersect);
+    if (highestIntersect != -1) {
+        printf("highest intersect: %i\n", highestIntersect);
+    }
     
     for(int i = 0; i < numberElements; i++ ){
         Element* element = elements[i];
-        element->updateAttention(i == highestIntersect);
-        
-        if (element->capturedFocus()) {
+        if(element->updateAttention(i == highestIntersect)){
+            
             hasAddedElement = true;
-            Element* newElement = element->spawnSimilarElement(gazeCoords);
+            Element* newElement = element->spawnSimilarElement((int)gazeCoords.x, (int)gazeCoords.y);
             elements.push_back(newElement);
-            element->resetAttention();
+//            newElement = element->spawnSimilarElement(gazeCoords);
+//            elements.push_back(newElement);
         }
     }
     
@@ -87,7 +89,7 @@ void ofApp::update(){
         
         elements.pop_front();
         
-        printf("size after delete: %i\n", elements.size());
+        printf("size after delete: %lu\n", elements.size());
     }
 }
 //--------------------------------------------------------------
