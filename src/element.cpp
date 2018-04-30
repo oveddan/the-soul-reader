@@ -10,14 +10,16 @@
 #include "ofMain.h"
 
 
-void Element::updateAttention(ofVec2f gaze) {
-    if (intersects(gaze)) {
+void Element::updateAttention(bool intersects) {
+    if (intersects) {
         if (!focusStarted) {
+            //printf("starting focus\n");
             focusStarted = true;
             focusStartTime = ofGetElapsedTimeMillis();
-        } else {
-            focusStarted = false;
         }
+    } else {
+        focusStarted = false;
+        focusStartTime = 0;
     }
 }
 
@@ -30,23 +32,25 @@ void Element::resetAttention() {
 }
 
 bool ColorElement::intersects(ofVec2f gaze) {
-    return gaze.x >= l() && gaze.x <= r() && gaze.y >= b() && gaze.y <= t();
+    return gaze.x >= l() && gaze.x <= r() && gaze.y <= b() && gaze.y >= t();
 }
 
 void ColorElement::render() {
     ofSetColor(color);
-    printf("%i %i %i %i\n", l(), t(), w, h);
     ofDrawRectangle(l(), t(), w, h);
 }
 
-int minDistance = 300;
+int minDistance = 500;
 
 int findValidCoord(int currentDimention, int max) {
-    if (currentDimention > minDistance) {
-        return std::round(ofRandom(0, currentDimention - minDistance));
+    int result;
+    if (currentDimention > max/2) {
+        result= std::round(ofRandom(0, currentDimention - minDistance));
     } else {
-        return std::round(ofRandom(currentDimention + minDistance, max));
+        result= std::round(ofRandom(currentDimention + minDistance, max));
     }
+    
+    return std::min(std::max(result, 0), max);
 }
 
 Element* ColorElement::spawnSimilarElement(ofVec2f gaze) {
@@ -57,8 +61,15 @@ Element* ColorElement::spawnSimilarElement(ofVec2f gaze) {
     int randomHeight = std::round(ofRandom(1, maxHeight));
     
     bool validXFound = false;
-    int x = findValidCoord(x, ofGetWidth());
-    int y = findValidCoord(y, ofGetHeight());
+    int newX = findValidCoord(gaze.x, ofGetWidth());
+    int newY = findValidCoord(gaze.y, ofGetHeight());
     
-    return new ColorElement(color, x, y, randomWidth, randomHeight);
+    printf("new x and y: %i %i\n", newX, newY);
+    
+    int newSaturation = ofClamp(ofRandom(-20, 20) + color.getSaturation(), 0., 255.);
+    int newHue = ofClamp(ofRandom(-20, 20) + color.getHue(), 0., 255.);
+    
+    ofColor newColor = ofColor::fromHsb(newHue, newSaturation, color.getBrightness());
+    
+    return new ColorElement(newColor, newX, newY, randomWidth, randomHeight);
 }

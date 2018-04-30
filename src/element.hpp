@@ -18,17 +18,18 @@ public:
     Element(int x, int y): x(x), y(y) {};
     virtual void animate() {};
     virtual void render() = 0;
-    void updateAttention(ofVec2f gaze);
+    void updateAttention(bool intersects);
     bool capturedFocus();
     virtual Element* spawnSimilarElement(ofVec2f gaze) = 0;
     void resetAttention();
+    virtual bool intersects(ofVec2f gaze) = 0;
+    virtual ~Element() {}
     
     float weight;
     int x;
     int y;
     
 protected:
-    virtual bool intersects(ofVec2f gaze) {};
     uint64_t focusStartTime;
     bool focusStarted;
 };
@@ -40,18 +41,18 @@ public:
     
     void render();
     Element* spawnSimilarElement(ofVec2f gaze);
+    bool intersects(ofVec2f gaze);
     
     ofColor color;
     
     int l() { return x - w/2;}
     int r() { return x + w/2;}
-    int t() { return y + h/2;}
-    int b() { return y - h/2;}
+    int t() { return y - h/2;}
+    int b() { return y + h/2;}
     
 protected:
     int w;
     int h;
-    bool intersects(ofVec2f gaze);
     
 };
 

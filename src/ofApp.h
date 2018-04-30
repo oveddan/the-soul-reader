@@ -24,11 +24,11 @@ class ofApp : public ofBaseApp{
     
     protected:
     void updateProfile();
-     ofShader shader;
+     ofShader focusBlurShader;
      ofShader shader2;
      ofImage image;
   
-    std::vector<Element *> colorElements;
+    std::deque<Element *> elements;
     
      ofFbo fboBlurOnePass;
      ofFbo fboBlurTwoPass;

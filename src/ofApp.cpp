@@ -3,13 +3,21 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
- shader.load("shaders/wood");
+ focusBlurShader.load("shaders/wood.vert", "shaders/focusBlur.frag");
  shader2.load("shaders/wood");
+    
+ ofHideCursor();
  fboBlurOnePass.allocate(ofGetWidth(), ofGetHeight());
+    
     
     fboBlurOnePass.begin();
     ofClear(0,0,0,255);
     fboBlurOnePass.end();
+    
+    fboBlurTwoPass.allocate(ofGetWidth(), ofGetHeight());
+    ofClear(0,0,0,255);
+    fboBlurTwoPass.end();
+    
     int randomHue = std::round(ofRandom(0, 255));
     int randomSaturation =std::round(ofRandom(100, 255));
     ofColor baseColor = ofColor::fromHsb(randomHue, randomSaturation, 255);
@@ -26,41 +34,71 @@ void ofApp::setup(){
         int y = height/2;
         Element* element = new ColorElement(color, x, y, width, height);
     
-        colorElements.push_back(element);
+        elements.push_back(element);
     }
-}
-
-//--------------------------------------------------------------
-void ofApp::update(){
-
 }
 
 ofVec2f getGazeCoords() {
     return ofVec2f(ofGetMouseX(), ofGetMouseY());
 }
 
-void ofApp::updateProfile() {
-    int numberElements = colorElements.size();
-    ofVec2f gazeCoords = getGazeCoords();
 
-    for(int i = 0; i < numberElements; i++) {
-        Element* element = colorElements[i];
-        element->updateAttention(gazeCoords);
-        
-        if (element->capturedFocus()) {
-            Element* newElement = element->spawnSimilarElement(gazeCoords);
-            colorElements.push_back(newElement);
-            element->resetAttention();
-        }
-    }
+const int MAX_ELEMENTS = 80;
+
+bool isValidGazeCoords(ofVec2f gazeCoords) {
+    return gazeCoords.x >= 0 && gazeCoords.x <= ofGetWidth() && gazeCoords.y >= 0 && gazeCoords.y <= ofGetHeight();
 }
 
 //--------------------------------------------------------------
+void ofApp::update(){
+    int numberElements = elements.size();
+    ofVec2f gazeCoords = getGazeCoords();
+    
+    if (!isValidGazeCoords(gazeCoords))
+        return;
+    
+    int highestIntersect = -1;
+    
+    for(int i = 0; i < numberElements; i++) {
+        Element* element = elements[i];
+        if (element->intersects(gazeCoords)) {
+            highestIntersect = std::max(i, highestIntersect);
+        }
+    }
+    
+    bool hasAddedElement = false;
+    
+    printf("highest intersect: %i\n", highestIntersect);
+    
+    for(int i = 0; i < numberElements; i++ ){
+        Element* element = elements[i];
+        element->updateAttention(i == highestIntersect);
+        
+        if (element->capturedFocus()) {
+            hasAddedElement = true;
+            Element* newElement = element->spawnSimilarElement(gazeCoords);
+            elements.push_back(newElement);
+            element->resetAttention();
+        }
+    }
+    
+    if (elements.size() > MAX_ELEMENTS) {
+        delete elements.front();
+        
+        elements.pop_front();
+        
+        printf("size after delete: %i\n", elements.size());
+    }
+}
+//--------------------------------------------------------------
 void ofApp::draw(){
-    void updateProfile();
+//    printf("Gaze coords %lu, %lu\n", ofGetMouseX(), ofGetMouseY());
+    
     
     ofBackground(0);
     fboBlurOnePass.begin();
+    
+    ofClear(255,255,255, 0);
 //    shader.begin();
 //    shader.setUniform1f("u_time", ofGetElapsedTimef());
 //    shader.setUniform2f("u_resolution",ofGetWidth(), ofGetHeight());
@@ -68,12 +106,30 @@ void ofApp::draw(){
 //    ofDrawRectangle(0, 0, ofGetWidth() / 2, ofGetHeight() / 2);
 //    shader.end();
     
-    for(unsigned int i = 0; i < colorElements.size(); i++) {
-        colorElements[i]->render();
+    for(unsigned int i = 0; i < elements.size(); i++) {
+        elements[i]->render();
     }
     fboBlurOnePass.end();
+    //ofSetColor(ofColor::white);
+    
+    fboBlurTwoPass.begin();
+    
+    focusBlurShader.begin();
+    focusBlurShader.setUniform1f("u_time", ofGetElapsedTimef());
+    focusBlurShader.setUniform2f("u_resolution",ofGetWidth(), ofGetHeight());
+    focusBlurShader.setUniform2f("u_mouse", ofGetMouseX(), ofGetMouseY());
+    
+    focusBlurShader.setUniformTexture("outputGraphic", fboBlurOnePass.getTextureReference(), 1);
     
     fboBlurOnePass.draw(0, 0);
+    
+    focusBlurShader.end();
+    fboBlurTwoPass.end();
+    
+    fboBlurTwoPass.draw(0, 0);
+    
+    
+
 }
 
 //--------------------------------------------------------------
