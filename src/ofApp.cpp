@@ -3,6 +3,11 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+    vidGrabber.setPixelFormat(OF_PIXELS_BGR);
+  vidGrabber.setup(1024,768);
+  colorImg.allocate(1024,768);
+    
+    
  focusBlurShader.load("shaders/wood.vert", "shaders/focusBlur.frag");
  shader2.load("shaders/wood");
     
@@ -48,7 +53,15 @@ bool isValidGazeCoords(ofVec2f &gazeCoords) {
 
 //--------------------------------------------------------------
 void ofApp::update(){
+    
+    vidGrabber.update();
+    bool newFrame = vidGrabber.isFrameNew();
+    
     int numberElements = elements.size();
+    
+    if (newFrame) {
+        colorImg.setFromPixels(vidGrabber.getPixels());
+    }
     
     ofVec2f gazeCoords = ofVec2f(ofGetMouseX(), ofGetMouseY());
     
@@ -131,7 +144,7 @@ void ofApp::draw(){
     fboBlurTwoPass.draw(0, 0);
     
     
-
+    colorImg.draw(0, 0);
 }
 
 //--------------------------------------------------------------
