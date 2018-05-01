@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include "ofMain.h"
 
-#define FOCUS_TIME_MS 300
+#define FOCUS_TIME_MS 700
 
 class Element {
 public:
