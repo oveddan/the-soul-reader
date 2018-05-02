@@ -40,5 +40,4 @@ protected:
     ofFbo fboBlurTwoPass;
     
     ofTrueTypeFont font;
-    
 };

@@ -75,10 +75,16 @@ int findValidCoord(int currentDimention, int totalSize) {
 }
 
 ofColor getSimilarColor(ofColor color) {
-    int newSaturation = ofClamp(ofRandom(-20, 20) + color.getSaturation(), 0., 255.);
-    int newHue = ofClamp(ofRandom(-20, 20) + color.getHue(), 0., 255.);
+    float newSaturation = std::round(ofClamp(ofRandom(-20, 20) + color.getSaturation(), 0., 255.));
+    float newHue = std::round(ofClamp(ofRandom(-20, 20) + color.getHue(), 0., 255.));
+    float newBrightness =color.getBrightness();
     
-    return ofColor::fromHsb(newHue, newSaturation, color.getBrightness());
+    ofColor newColor = ofColor::fromHsb(newHue, newSaturation, newBrightness);
+    
+    
+    printf("in similar color %f %f %f\n", newColor.getHue(), newColor.getSaturation(), color.getBrightness());
+
+    return newColor;
 }
 
 Element* ColorElement::spawnSimilarElement(int gazeX, int gazeY) {
@@ -92,8 +98,6 @@ Element* ColorElement::spawnSimilarElement(int gazeX, int gazeY) {
     int newX = findValidCoord(gazeX, ofGetWidth());
     int newY = findValidCoord(gazeY, ofGetHeight());
     
-    //    printf("new x and y, w, h: %i %i\n", newX, newY, randomWidth, randomHeight);
-    
     ofColor newColor = getSimilarColor(color);
     
     return new ColorElement(newColor, newX, newY, randomWidth, randomHeight);
@@ -102,17 +106,39 @@ Element* ColorElement::spawnSimilarElement(int gazeX, int gazeY) {
 Element* WordElement::spawnSimilarElement(int gazeX, int gazeY) {
     int newX = findValidCoord(gazeX, ofGetWidth());
     int newY = findValidCoord(gazeY, ofGetHeight());
-    return new WordElement(getSimilarColor(color), newX, newY, font, synsetKey);
+    ofColor newColor = getSimilarColor(color);
+
+    return new WordElement(newColor, newX, newY, font, synsetKey);
 }
 
 void WordElement::render() {
-  if (loaded)
-      font.drawString(word, x, y);
+    if (loaded) {
+        ofEnableAlphaBlending();
+        ofSetColor(0, 0, 0, 100);
+        ofRectangle rect = font.getStringBoundingBox(word, x, y);
+        float padding = 5;
+        float expandedWidth =rect.width + padding * 2;
+        float expandedHeight =rect.height + padding * 2;
+        ofDrawRectangle(rect.x - padding, rect.y - padding, expandedWidth, expandedHeight);
+        
+        ofSetColor(color);
+        font.drawString(word, x, y);
+        
+    }
 }
 
-void WordElement::loadSimilarWord() {
-    ofLoadURLAsync("http://localhost:5000/similar_word/" + similarWordSynsetKey,
-                   "async_req");
+float probabilityDifferentWord = 0.25;
+
+void WordElement::loadWord() {
+    float randomValue = ofRandom(0., 1.);
+    
+    if (randomValue <= probabilityDifferentWord) {
+        ofLoadURLAsync("http://localhost:5000/random_word",
+                       "async_req");
+    } else {
+        ofLoadURLAsync("http://localhost:5000/similar_word/" + similarWordSynsetKey,
+                       "async_req");
+    }
 }
 
 bool WordElement::intersects(int gazeX, int gazeY) {
@@ -123,17 +149,24 @@ bool WordElement::intersects(int gazeX, int gazeY) {
     return rect.inside(gazeX, gazeY);
 }
 
+// HACK - there is no way to register different instance of this
+// class to handle the url response, so for now we just need to
+// fake it and set the status to negative 1
+#define ALREADY_HANDLED -1
+
 void WordElement::urlResponse(ofHttpResponse & response) {
-    if (!loaded) {
-        if (response.status==200) {
-            string body = response.data;
-            int keyBreak = body.find(":");
-            synsetKey = body.substr(0, keyBreak);
-            word = body.substr(keyBreak + 1, body.length() - keyBreak - 1);
-            loaded = true;
-            cout << "got key and word " << synsetKey << " " << word;
-        } else {
-            cout << response.status << " " << response.error << endl;
-        }
+    if (loaded || response.status == ALREADY_HANDLED)
+        return;
+    
+    if (response.status==200) {
+        response.status = ALREADY_HANDLED;
+        string body = response.data;
+        int keyBreak = body.find(":");
+        synsetKey = body.substr(0, keyBreak);
+        word = body.substr(keyBreak + 1, body.length() - keyBreak - 1);
+        loaded = true;
+        cout << "got key and word " << synsetKey << " " << word;
+    } else {
+        cout << response.status << " " << response.error << endl;
     }
 }

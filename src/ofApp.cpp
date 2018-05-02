@@ -8,10 +8,11 @@ void ofApp::setup(){
     //     bool connected = client.setup("localhost", 5555);
     
     vidGrabber.setPixelFormat(OF_PIXELS_BGR);
-    vidGrabber.setup(1024,768);
-    colorImg.allocate(1024,768);
+    vidGrabber.setup(1920,1080);
+    colorImg.allocate(1920,1080);
     
-    font.load("fonts/NewsCycle-Bold.ttf", 32);
+    font.load("fonts/NewsCycle-Bold.ttf", 40);
+    
     
     //  context = zmqMakeContext(2);
     //  socket = zmqMakeSocket(*context, ZMQ_PUSH);
@@ -48,10 +49,13 @@ void ofApp::setup(){
         Element* element = new ColorElement(color, x, y, width, height);
         
         elements.push_back(element);
+        
+        int wordX =ofRandom(0, ofGetWidth());
+        int wordY = ofRandom(0, ofGetHeight());
+        Element* wordElement = new WordElement(color, wordX, wordY, font, "n10569926");
+        
+        elements.push_back(wordElement);
     }
-    
-    Element* wordElement = new WordElement(baseColor, 500, 500, font, "n10569926");
-    elements.push_back(wordElement);
 }
 
 const int MAX_ELEMENTS = 100;
@@ -72,6 +76,7 @@ void ofApp::update(){
     
     if (newFrame) {
         colorImg.setFromPixels(vidGrabber.getPixels());
+        colorImg.mirror(false, true);
     }
     
     ofVec2f gazeCoords = ofVec2f(ofGetMouseX(), ofGetMouseY());
@@ -135,7 +140,7 @@ void ofApp::draw(){
     
     ofClear(255,255,255, 0);
     
-    colorImg.draw(0, 0);
+    colorImg.draw(0, 0, ofGetWidth(), ofGetHeight());
     
     for(unsigned int i = 0; i < elements.size(); i++) {
         elements[i]->render();
