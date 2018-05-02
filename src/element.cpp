@@ -25,6 +25,7 @@ bool Element::updateAttention(bool intersects) {
     } else {
         focusStarted = false;
         focusStartTime = 0;
+        elapsedFocusStartTime = 0;
         return false;
     }
 }
@@ -73,7 +74,7 @@ Element* ColorElement::spawnSimilarElement(int gazeX, int gazeY) {
     int newX = findValidCoord(gazeX, ofGetWidth());
     int newY = findValidCoord(gazeY, ofGetHeight());
     
-    printf("new x and y, w, h: %i %i\n", newX, newY, randomWidth, randomHeight);
+//    printf("new x and y, w, h: %i %i\n", newX, newY, randomWidth, randomHeight);
     
     int newSaturation = ofClamp(ofRandom(-20, 20) + color.getSaturation(), 0., 255.);
     int newHue = ofClamp(ofRandom(-20, 20) + color.getHue(), 0., 255.);

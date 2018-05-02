@@ -10,6 +10,7 @@ in vec2 texCoordVarying;
 uniform vec2 u_resolution;
 uniform vec2 u_mouse;
 uniform float u_time;
+uniform float u_focusDuration;
 
 float random (in vec2 st) {
     return fract(sin(dot(st.xy,

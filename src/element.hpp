@@ -22,6 +22,7 @@ public:
     virtual Element* spawnSimilarElement(int gazeX, int gazeY) = 0;
     virtual bool intersects(int gazeX, int gazeY) = 0;
     virtual ~Element() {}
+    int getFocusDuration() { return ofGetElapsedTimeMillis() - focusStartTime; };
     
     float weight;
     int x;
@@ -29,6 +30,7 @@ public:
     
 protected:
     uint64_t focusStartTime;
+    uint64_t elapsedFocusStartTime;
     bool focusStarted;
 };
 

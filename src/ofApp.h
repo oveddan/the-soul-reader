@@ -3,11 +3,11 @@
 #include "ofMain.h"
 #include "element.hpp"
 #include "ofxOpenCv.h"
-//#include <zeromq/zmq.hpp>
 
 class ofApp : public ofBaseApp{
 
 	public:
+        ofApp() {};
 		void setup();
 		void update();
 		void draw();
@@ -27,7 +27,6 @@ class ofApp : public ofBaseApp{
     protected:
     ofVideoGrabber vidGrabber;
     ofxCvColorImage            colorImg;
-    
     void updateProfile();
      ofShader focusBlurShader;
      ofShader shader2;

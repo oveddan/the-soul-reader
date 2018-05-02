@@ -1,13 +1,20 @@
 #include "ofApp.h"
 #include "math.h"
 
+
+
 //--------------------------------------------------------------
 void ofApp::setup(){
+//     bool connected = client.setup("localhost", 5555);
+    
     vidGrabber.setPixelFormat(OF_PIXELS_BGR);
   vidGrabber.setup(1024,768);
   colorImg.allocate(1024,768);
     
-    
+//  context = zmqMakeContext(2);
+//  socket = zmqMakeSocket(*context, ZMQ_PUSH);
+//  socket->bind("tcp://localhost:5555");
+
  focusBlurShader.load("shaders/wood.vert", "shaders/focusBlur.frag");
  shader2.load("shaders/wood");
     
@@ -33,29 +40,31 @@ void ofApp::setup(){
         int newHue = randomHue + ( 255 / numberOfColors) * i;
         if (newHue > 255) { newHue = newHue - 255; }
         ofColor color = ofColor::fromHsb(newHue, randomSaturation, 255);
-        int width = ofGetWidth() / numberOfColors;
-        int height = ofGetHeight();
-        int x= width * i + width/2;
-        int y = height/2;
+        int width = ofRandom(0, ofGetWidth() / 4);
+        int height = ofRandom(0, ofGetHeight() / 4);
+        int x = ofRandom(0, ofGetWidth());
+        int y =  ofRandom(0, ofGetHeight());
         Element* element = new ColorElement(color, x, y, width, height);
     
         elements.push_back(element);
     }
 }
 
-
-
-const int MAX_ELEMENTS = 200;
+const int MAX_ELEMENTS = 10;
 
 bool isValidGazeCoords(ofVec2f &gazeCoords) {
     return gazeCoords.x >= 0 && gazeCoords.x <= ofGetWidth() && gazeCoords.y >= 0 && gazeCoords.y <= ofGetHeight();
 }
+
+int focusDuration = 0;
 
 //--------------------------------------------------------------
 void ofApp::update(){
     
     vidGrabber.update();
     bool newFrame = vidGrabber.isFrameNew();
+    
+   
     
     int numberElements = elements.size();
     
@@ -81,13 +90,19 @@ void ofApp::update(){
     
     bool hasAddedElement = false;
     
-    if (highestIntersect != -1) {
-        printf("highest intersect: %i\n", highestIntersect);
-    }
+//    if (highestIntersect != -1) {
+//        printf("highest intersect: %i\n", highestIntersect);
+//    }
     
     for(int i = 0; i < numberElements; i++ ){
         Element* element = elements[i];
-        if(element->updateAttention(i == highestIntersect)){
+        bool isHighestInteract =i == highestIntersect;
+        
+        if (isHighestInteract) {
+            focusDuration = element->getFocusDuration();
+        }
+        
+        if(element->updateAttention(isHighestInteract)){
             
             hasAddedElement = true;
             Element* newElement = element->spawnSimilarElement((int)gazeCoords.x, (int)gazeCoords.y);
@@ -114,12 +129,8 @@ void ofApp::draw(){
     fboBlurOnePass.begin();
     
     ofClear(255,255,255, 0);
-//    shader.begin();
-//    shader.setUniform1f("u_time", ofGetElapsedTimef());
-//    shader.setUniform2f("u_resolution",ofGetWidth(), ofGetHeight());
-//    shader.setUniform2f("u_mouse", ofGetMouseX(), ofGetMouseY());
-//    ofDrawRectangle(0, 0, ofGetWidth() / 2, ofGetHeight() / 2);
-//    shader.end();
+    
+    colorImg.draw(0, 0);
     
     for(unsigned int i = 0; i < elements.size(); i++) {
         elements[i]->render();
@@ -133,6 +144,8 @@ void ofApp::draw(){
     focusBlurShader.setUniform1f("u_time", ofGetElapsedTimef());
     focusBlurShader.setUniform2f("u_resolution",ofGetWidth(), ofGetHeight());
     focusBlurShader.setUniform2f("u_mouse", ofGetMouseX(), ofGetMouseY());
+    printf("focus duration %i\n", focusDuration);
+    focusBlurShader.setUniform1f("u_focusDuration", focusDuration);
     
     focusBlurShader.setUniformTexture("outputGraphic", fboBlurOnePass.getTextureReference(), 1);
     
@@ -144,7 +157,6 @@ void ofApp::draw(){
     fboBlurTwoPass.draw(0, 0);
     
     
-    colorImg.draw(0, 0);
 }
 
 //--------------------------------------------------------------
