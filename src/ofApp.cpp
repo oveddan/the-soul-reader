@@ -5,21 +5,21 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-//     bool connected = client.setup("localhost", 5555);
+    //     bool connected = client.setup("localhost", 5555);
     
     vidGrabber.setPixelFormat(OF_PIXELS_BGR);
-  vidGrabber.setup(1024,768);
-  colorImg.allocate(1024,768);
+    vidGrabber.setup(1024,768);
+    colorImg.allocate(1024,768);
     
-//  context = zmqMakeContext(2);
-//  socket = zmqMakeSocket(*context, ZMQ_PUSH);
-//  socket->bind("tcp://localhost:5555");
-
- focusBlurShader.load("shaders/wood.vert", "shaders/focusBlur.frag");
- shader2.load("shaders/wood");
+    //  context = zmqMakeContext(2);
+    //  socket = zmqMakeSocket(*context, ZMQ_PUSH);
+    //  socket->bind("tcp://localhost:5555");
     
- ofHideCursor();
- fboBlurOnePass.allocate(ofGetWidth(), ofGetHeight());
+    focusBlurShader.load("shaders/wood.vert", "shaders/focusBlur.frag");
+    shader2.load("shaders/wood");
+    
+    ofHideCursor();
+    fboBlurOnePass.allocate(ofGetWidth(), ofGetHeight());
     
     
     fboBlurOnePass.begin();
@@ -45,7 +45,7 @@ void ofApp::setup(){
         int x = ofRandom(0, ofGetWidth());
         int y =  ofRandom(0, ofGetHeight());
         Element* element = new ColorElement(color, x, y, width, height);
-    
+        
         elements.push_back(element);
     }
 }
@@ -64,7 +64,7 @@ void ofApp::update(){
     vidGrabber.update();
     bool newFrame = vidGrabber.isFrameNew();
     
-   
+    
     
     int numberElements = elements.size();
     
@@ -74,7 +74,7 @@ void ofApp::update(){
     
     ofVec2f gazeCoords = ofVec2f(ofGetMouseX(), ofGetMouseY());
     
-//    printf("gaze x, y, %i %i\n", ofGetMouseX(), ofGetMouseY());
+    //    printf("gaze x, y, %i %i\n", ofGetMouseX(), ofGetMouseY());
     
     if (!isValidGazeCoords(gazeCoords))
         return;
@@ -90,9 +90,9 @@ void ofApp::update(){
     
     bool hasAddedElement = false;
     
-//    if (highestIntersect != -1) {
-//        printf("highest intersect: %i\n", highestIntersect);
-//    }
+    //    if (highestIntersect != -1) {
+    //        printf("highest intersect: %i\n", highestIntersect);
+    //    }
     
     for(int i = 0; i < numberElements; i++ ){
         Element* element = elements[i];
@@ -107,8 +107,8 @@ void ofApp::update(){
             hasAddedElement = true;
             Element* newElement = element->spawnSimilarElement((int)gazeCoords.x, (int)gazeCoords.y);
             elements.push_back(newElement);
-//            newElement = element->spawnSimilarElement(gazeCoords);
-//            elements.push_back(newElement);
+            //            newElement = element->spawnSimilarElement(gazeCoords);
+            //            elements.push_back(newElement);
         }
     }
     
@@ -122,7 +122,7 @@ void ofApp::update(){
 }
 //--------------------------------------------------------------
 void ofApp::draw(){
-//    printf("Gaze coords %lu, %lu\n", ofGetMouseX(), ofGetMouseY());
+    //    printf("Gaze coords %lu, %lu\n", ofGetMouseX(), ofGetMouseY());
     
     
     ofBackground(0);
@@ -161,55 +161,55 @@ void ofApp::draw(){
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
-
+    
 }
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){
-
+    
 }
 
 //--------------------------------------------------------------
 void ofApp::mouseMoved(int x, int y ){
-
+    
 }
 
 //--------------------------------------------------------------
 void ofApp::mouseDragged(int x, int y, int button){
-
+    
 }
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
-
+    
 }
 
 //--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button){
-
+    
 }
 
 //--------------------------------------------------------------
 void ofApp::mouseEntered(int x, int y){
-
+    
 }
 
 //--------------------------------------------------------------
 void ofApp::mouseExited(int x, int y){
-
+    
 }
 
 //--------------------------------------------------------------
 void ofApp::windowResized(int w, int h){
-
+    
 }
 
 //--------------------------------------------------------------
 void ofApp::gotMessage(ofMessage msg){
-
+    
 }
 
 //--------------------------------------------------------------
 void ofApp::dragEvent(ofDragInfo dragInfo){ 
-
+    
 }

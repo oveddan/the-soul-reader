@@ -12,7 +12,7 @@
 
 bool Element::updateAttention(bool intersects) {
     if (intersects) {
-//        printf("elapsed time %lu", ofGetElapsedTimeMillis() - focusStartTime);
+        //        printf("elapsed time %lu", ofGetElapsedTimeMillis() - focusStartTime);
         if (!focusStarted) {
             //printf("starting focus\n");
             focusStarted = true;
@@ -31,15 +31,15 @@ bool Element::updateAttention(bool intersects) {
 }
 
 bool ColorElement::intersects(int gazeX, int gazeY) {
-//    printf("gaze %i %i, rect %i %i %i %i\n", gazeX, gazeY, x, y, x+w, y+h);
-//
-//
+    //    printf("gaze %i %i, rect %i %i %i %i\n", gazeX, gazeY, x, y, x+w, y+h);
+    //
+    //
     return gazeX >= x && gazeX <= x + w && gazeY >= y && gazeY <= y + h;
 }
 
 void ColorElement::render() {
     ofSetColor(color);
-//    printf("render rect %i %i %i %i %i %i\n", rectangle.x, rectangle.y, rectangle.getTop(), rectangle.getLeft(), rectangle.getRight(), rectangle.getBottom());
+    //    printf("render rect %i %i %i %i %i %i\n", rectangle.x, rectangle.y, rectangle.getTop(), rectangle.getLeft(), rectangle.getRight(), rectangle.getBottom());
     ofDrawRectangle(x, y, w, h);
 }
 
@@ -74,7 +74,7 @@ Element* ColorElement::spawnSimilarElement(int gazeX, int gazeY) {
     int newX = findValidCoord(gazeX, ofGetWidth());
     int newY = findValidCoord(gazeY, ofGetHeight());
     
-//    printf("new x and y, w, h: %i %i\n", newX, newY, randomWidth, randomHeight);
+    //    printf("new x and y, w, h: %i %i\n", newX, newY, randomWidth, randomHeight);
     
     int newSaturation = ofClamp(ofRandom(-20, 20) + color.getSaturation(), 0., 255.);
     int newHue = ofClamp(ofRandom(-20, 20) + color.getHue(), 0., 255.);
