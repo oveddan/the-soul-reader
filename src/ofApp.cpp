@@ -11,6 +11,8 @@ void ofApp::setup(){
     vidGrabber.setup(1024,768);
     colorImg.allocate(1024,768);
     
+    font.load("fonts/NewsCycle-Bold.ttf", 32);
+    
     //  context = zmqMakeContext(2);
     //  socket = zmqMakeSocket(*context, ZMQ_PUSH);
     //  socket->bind("tcp://localhost:5555");
@@ -47,6 +49,9 @@ void ofApp::setup(){
         
         elements.push_back(element);
     }
+    
+    Element* wordElement = new WordElement(baseColor, 500, 500, font, "n10569926");
+    elements.push_back(wordElement);
 }
 
 const int MAX_ELEMENTS = 100;
@@ -98,6 +103,8 @@ void ofApp::update(){
             
             hasAddedElement = true;
             Element* newElement = element->spawnSimilarElement((int)gazeCoords.x, (int)gazeCoords.y);
+            elements.push_back(newElement);
+            newElement = element->spawnSimilarElement((int)gazeCoords.x, (int)gazeCoords.y);
             elements.push_back(newElement);
         }
     }

@@ -36,9 +36,6 @@ bool Element::updateAttention(bool intersects) {
 }
 
 bool ColorElement::intersects(int gazeX, int gazeY) {
-    //    printf("gaze %i %i, rect %i %i %i %i\n", gazeX, gazeY, x, y, x+w, y+h);
-    //
-    //
     return gazeX >= x && gazeX <= x + w && gazeY >= y && gazeY <= y + h;
 }
 
@@ -77,6 +74,13 @@ int findValidCoord(int currentDimention, int totalSize) {
     return std::round(ofRandom(min, max));
 }
 
+ofColor getSimilarColor(ofColor color) {
+    int newSaturation = ofClamp(ofRandom(-20, 20) + color.getSaturation(), 0., 255.);
+    int newHue = ofClamp(ofRandom(-20, 20) + color.getHue(), 0., 255.);
+    
+    return ofColor::fromHsb(newHue, newSaturation, color.getBrightness());
+}
+
 Element* ColorElement::spawnSimilarElement(int gazeX, int gazeY) {
     int maxWidth = ofGetWidth() / 3;
     int maxHeight = ofGetHeight() / 3;
@@ -90,10 +94,46 @@ Element* ColorElement::spawnSimilarElement(int gazeX, int gazeY) {
     
     //    printf("new x and y, w, h: %i %i\n", newX, newY, randomWidth, randomHeight);
     
-    int newSaturation = ofClamp(ofRandom(-20, 20) + color.getSaturation(), 0., 255.);
-    int newHue = ofClamp(ofRandom(-20, 20) + color.getHue(), 0., 255.);
-    
-    ofColor newColor = ofColor::fromHsb(newHue, newSaturation, color.getBrightness());
+    ofColor newColor = getSimilarColor(color);
     
     return new ColorElement(newColor, newX, newY, randomWidth, randomHeight);
+}
+
+Element* WordElement::spawnSimilarElement(int gazeX, int gazeY) {
+    int newX = findValidCoord(gazeX, ofGetWidth());
+    int newY = findValidCoord(gazeY, ofGetHeight());
+    return new WordElement(getSimilarColor(color), newX, newY, font, synsetKey);
+}
+
+void WordElement::render() {
+  if (loaded)
+      font.drawString(word, x, y);
+}
+
+void WordElement::loadSimilarWord() {
+    ofLoadURLAsync("http://localhost:5000/similar_word/" + similarWordSynsetKey,
+                   "async_req");
+}
+
+bool WordElement::intersects(int gazeX, int gazeY) {
+    if (!loaded) return false;
+    
+    ofRectangle rect = font.getStringBoundingBox(word, x, y);
+
+    return rect.inside(gazeX, gazeY);
+}
+
+void WordElement::urlResponse(ofHttpResponse & response) {
+    if (!loaded) {
+        if (response.status==200) {
+            string body = response.data;
+            int keyBreak = body.find(":");
+            synsetKey = body.substr(0, keyBreak);
+            word = body.substr(keyBreak + 1, body.length() - keyBreak - 1);
+            loaded = true;
+            cout << "got key and word " << synsetKey << " " << word;
+        } else {
+            cout << response.status << " " << response.error << endl;
+        }
+    }
 }

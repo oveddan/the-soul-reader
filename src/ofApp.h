@@ -39,4 +39,6 @@ protected:
     ofFbo fboBlurOnePass;
     ofFbo fboBlurTwoPass;
     
+    ofTrueTypeFont font;
+    
 };
