@@ -22,16 +22,18 @@ public:
     virtual Element* spawnSimilarElement(int gazeX, int gazeY) = 0;
     virtual bool intersects(int gazeX, int gazeY) = 0;
     virtual ~Element() {}
-    int getFocusDuration() { return ofGetElapsedTimeMillis() - focusStartTime; };
+    uint32_t currentFocusIntervalDuration() { return ofGetElapsedTimeMillis() - focusIntervalStartTime; };
+    uint64_t totalFocusTime() { return ofGetElapsedTimeMillis() - focusStartTime; };
     
     float weight;
     int x;
     int y;
     
 protected:
+    uint64_t focusIntervalStartTime;
     uint64_t focusStartTime;
-    uint64_t elapsedFocusStartTime;
     bool focusStarted;
+    bool intervalStarted;
 };
 
 class ColorElement : public Element {
@@ -49,6 +51,7 @@ protected:
     int w;
     int h;
     ofRectangle rectangle;
+    
     
 };
 

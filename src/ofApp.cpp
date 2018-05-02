@@ -16,7 +16,6 @@ void ofApp::setup(){
     //  socket->bind("tcp://localhost:5555");
     
     focusBlurShader.load("shaders/wood.vert", "shaders/focusBlur.frag");
-    shader2.load("shaders/wood");
     
     ofHideCursor();
     fboBlurOnePass.allocate(ofGetWidth(), ofGetHeight());
@@ -50,7 +49,7 @@ void ofApp::setup(){
     }
 }
 
-const int MAX_ELEMENTS = 10;
+const int MAX_ELEMENTS = 100;
 
 bool isValidGazeCoords(ofVec2f &gazeCoords) {
     return gazeCoords.x >= 0 && gazeCoords.x <= ofGetWidth() && gazeCoords.y >= 0 && gazeCoords.y <= ofGetHeight();
@@ -64,8 +63,6 @@ void ofApp::update(){
     vidGrabber.update();
     bool newFrame = vidGrabber.isFrameNew();
     
-    
-    
     int numberElements = elements.size();
     
     if (newFrame) {
@@ -73,8 +70,6 @@ void ofApp::update(){
     }
     
     ofVec2f gazeCoords = ofVec2f(ofGetMouseX(), ofGetMouseY());
-    
-    //    printf("gaze x, y, %i %i\n", ofGetMouseX(), ofGetMouseY());
     
     if (!isValidGazeCoords(gazeCoords))
         return;
@@ -90,16 +85,13 @@ void ofApp::update(){
     
     bool hasAddedElement = false;
     
-    //    if (highestIntersect != -1) {
-    //        printf("highest intersect: %i\n", highestIntersect);
-    //    }
-    
-    for(int i = 0; i < numberElements; i++ ){
+    currentFocusedElement = -1;
+    for(uint16_t i = 0; i < numberElements; i++ ){
         Element* element = elements[i];
         bool isHighestInteract =i == highestIntersect;
         
         if (isHighestInteract) {
-            focusDuration = element->getFocusDuration();
+            currentFocusedElement = i;
         }
         
         if(element->updateAttention(isHighestInteract)){
@@ -107,24 +99,30 @@ void ofApp::update(){
             hasAddedElement = true;
             Element* newElement = element->spawnSimilarElement((int)gazeCoords.x, (int)gazeCoords.y);
             elements.push_back(newElement);
-            //            newElement = element->spawnSimilarElement(gazeCoords);
-            //            elements.push_back(newElement);
         }
     }
     
     if (elements.size() > MAX_ELEMENTS) {
-        delete elements.front();
+        Element* front = elements.front();
         
         elements.pop_front();
+        
+        if (currentFocusedElement == 0) {
+            Element* otherFront = elements.front();
+            elements.pop_front();
+            delete otherFront;
+            
+            elements.push_front(front);
+        } else {
+            currentFocusedElement--;
+            delete front;
+        }
         
         printf("size after delete: %lu\n", elements.size());
     }
 }
 //--------------------------------------------------------------
 void ofApp::draw(){
-    //    printf("Gaze coords %lu, %lu\n", ofGetMouseX(), ofGetMouseY());
-    
-    
     ofBackground(0);
     fboBlurOnePass.begin();
     
@@ -136,7 +134,6 @@ void ofApp::draw(){
         elements[i]->render();
     }
     fboBlurOnePass.end();
-    //ofSetColor(ofColor::white);
     
     fboBlurTwoPass.begin();
     
@@ -144,8 +141,15 @@ void ofApp::draw(){
     focusBlurShader.setUniform1f("u_time", ofGetElapsedTimef());
     focusBlurShader.setUniform2f("u_resolution",ofGetWidth(), ofGetHeight());
     focusBlurShader.setUniform2f("u_mouse", ofGetMouseX(), ofGetMouseY());
-    printf("focus duration %i\n", focusDuration);
-    focusBlurShader.setUniform1f("u_focusDuration", focusDuration);
+    
+    if (currentFocusedElement > 0 && currentFocusedElement < elements.size()) {
+        Element* focusedElement = elements[currentFocusedElement];
+        focusBlurShader.setUniform1f("u_focusDuration", focusedElement->currentFocusIntervalDuration());
+        focusBlurShader.setUniform1f("u_totalFocusDuration", focusedElement->totalFocusTime());
+    } else {
+        focusBlurShader.setUniform1f("u_focusDuration", 0);
+        focusBlurShader.setUniform1f("u_totalFocusDuration", 0);
+    }
     
     focusBlurShader.setUniformTexture("outputGraphic", fboBlurOnePass.getTextureReference(), 1);
     

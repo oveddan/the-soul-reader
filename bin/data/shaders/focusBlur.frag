@@ -9,6 +9,7 @@ uniform vec2 u_resolution;
 uniform vec2 u_mouse;
 uniform float u_time;
 uniform float u_focusDuration;
+uniform float u_totalFocusDuration;
 
 out vec4 outputColor;
 
@@ -50,43 +51,49 @@ mat2 rotate2d(float angle){
                 sin(angle),cos(angle));
 }
 
+#define PI 3.14
+
+vec2 toRadialCoords(vec2 val, float scale) {
+    return vec2(length(val) * scale, sin(val.y/length(val)) / PI);
+}
+
+float noisyWaveHeight(vec2 val) {
+  vec2 xy = val - texCoordVarying;
+  return noise(toRadialCoords(xy, 1./20.) + sin(u_time / 3.));
+}
+
+vec2 noisyNormal(vec2 val) {
+    float d = 1.;
+    vec2 vdx = val + vec2(0., d);
+    vec2 vdy = val + vec2(d, 0.);
+    
+    float n = noisyWaveHeight(val);
+    float ndx = noisyWaveHeight(vdx);
+    float ndy = noisyWaveHeight(vdy);
+    
+    return vec2(ndx - n, ndy - n) / d;
+}
+
 void main() {
     
     vec2 st = gl_FragCoord.xy/u_resolution.xy;
     st.y *= u_resolution.y/u_resolution.x;
     
-    //float effectStrength = smoothstep(1., 0., length(gl_FragCoord.xy, u_mouse));
-    
     vec2 mousePct = u_mouse / u_resolution.xy;
     mousePct.y *= u_resolution.y/u_resolution.x;
-    float cursorStrength = smoothstep(.05 + u_focusDuration / 10000., 0., length(mousePct - st));
+    float cursorStrength = smoothstep(.02 + u_totalFocusDuration / 30000., 0., length(mousePct - st));
     
-//    cursorStrength *= noise(sin(st * 4.));
-    
-    float n = noise(sin(texCoordVarying / 10.) + u_time);
+    float n = noise(toRadialCoords(texCoordVarying-u_mouse, 1./10.) + sin(u_time));
     
     vec2 pos = texCoordVarying;
-//    vec2 warp = n;
     
-    vec3 src = texture(outputGraphic, pos + n * 20. * cursorStrength).rgb;
+    vec3 src = texture(outputGraphic, pos + n * 10. * cursorStrength).rgb;
     
-//    float warpN = noise(sin(texCoordVarying / 5.) + u_time);
-//    vec3 color = mix(src, 1.-src, smoothstep(.05, 0., length(mousePct - st)) * warpN);
+    float cursorSize = pow(smoothstep(.02 + u_totalFocusDuration / 30000., 0., length(mousePct - st)), 2);
     
-    vec2 xy = mousePct - gl_FragCoord.xy;
-    float theta = tan(xy.y / xy.x);
+    float height =noisyWaveHeight(u_mouse);
     
-    float radialNoise = noise(vec2(xy.x, xy.y) / 20.);
-    
-     vec3 color = mix(src, vec3(1.), cursorStrength * radialNoise * 2.);
-    
-
-    
-//    if (st.x >= .5) {
-//        outputColor = vec4(.5, .5, .5, 1.);
-//    } else {
-//        outputColor = vec4(src,1.0);
-//    }
+    vec3 color = mix(src, vec3(0.), pow(cursorSize, 2) * .5 * height);
     
     outputColor = vec4(color, 1.);
 }

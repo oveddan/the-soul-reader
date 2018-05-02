@@ -7,7 +7,7 @@
 class ofApp : public ofBaseApp{
     
 public:
-    ofApp() {};
+    ofApp() : currentFocusedElement(-1) {};
     void setup();
     void update();
     void draw();
@@ -29,10 +29,12 @@ protected:
     ofxCvColorImage            colorImg;
     void updateProfile();
     ofShader focusBlurShader;
-    ofShader shader2;
     ofImage image;
+    uint16_t currentFocusedElement;
     
     std::deque<Element *> elements;
+    
+    ofFbo fboElementsPass;
     
     ofFbo fboBlurOnePass;
     ofFbo fboBlurTwoPass;

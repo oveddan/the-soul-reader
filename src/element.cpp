@@ -12,20 +12,25 @@
 
 bool Element::updateAttention(bool intersects) {
     if (intersects) {
-        //        printf("elapsed time %lu", ofGetElapsedTimeMillis() - focusStartTime);
         if (!focusStarted) {
-            //printf("starting focus\n");
             focusStarted = true;
             focusStartTime = ofGetElapsedTimeMillis();
-            return false;
-        } else if (ofGetElapsedTimeMillis() - focusStartTime >= FOCUS_TIME_MS) {
-            focusStarted = false;
-            return true;
+        } if (!intervalStarted) {
+            intervalStarted = true;
+            focusIntervalStartTime = ofGetElapsedTimeMillis();
         }
+        
+        if (ofGetElapsedTimeMillis() - focusIntervalStartTime >= FOCUS_TIME_MS) {
+            intervalStarted = false;
+            focusIntervalStartTime = ofGetElapsedTimeMillis();
+            return true;
+        } else
+            return false;
     } else {
         focusStarted = false;
+        intervalStarted = false;
+        focusIntervalStartTime = 0;
         focusStartTime = 0;
-        elapsedFocusStartTime = 0;
         return false;
     }
 }
@@ -38,8 +43,17 @@ bool ColorElement::intersects(int gazeX, int gazeY) {
 }
 
 void ColorElement::render() {
-    ofSetColor(color);
-    //    printf("render rect %i %i %i %i %i %i\n", rectangle.x, rectangle.y, rectangle.getTop(), rectangle.getLeft(), rectangle.getRight(), rectangle.getBottom());
+    if (focusStarted) {
+        ofColor ligtherColor = ofColor::fromHsb(
+                                                color.getHue(),
+                                                color.getSaturation() + 30,
+                                                color.getBrightness()
+                                                );
+        ofSetColor(ligtherColor);
+    } else {
+        ofSetColor(color);
+    }
+    
     ofDrawRectangle(x, y, w, h);
 }
 
@@ -64,11 +78,11 @@ int findValidCoord(int currentDimention, int totalSize) {
 }
 
 Element* ColorElement::spawnSimilarElement(int gazeX, int gazeY) {
-    int maxWidth = ofGetWidth() / 4;
-    int maxHeight = ofGetHeight() / 4;
+    int maxWidth = ofGetWidth() / 3;
+    int maxHeight = ofGetHeight() / 3;
     
-    int randomWidth =  std::round(ofRandom(1, maxWidth));
-    int randomHeight = std::round(ofRandom(1, maxHeight));
+    int randomWidth =  std::round(ofRandom(10, maxWidth));
+    int randomHeight = std::round(ofRandom(10, maxHeight));
     
     bool validXFound = false;
     int newX = findValidCoord(gazeX, ofGetWidth());
