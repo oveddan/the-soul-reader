@@ -80,9 +80,6 @@ ofColor getSimilarColor(ofColor color) {
     float newBrightness =color.getBrightness();
     
     ofColor newColor = ofColor::fromHsb(newHue, newSaturation, newBrightness);
-    
-    
-    printf("in similar color %f %f %f\n", newColor.getHue(), newColor.getSaturation(), color.getBrightness());
 
     return newColor;
 }
@@ -138,14 +135,14 @@ Element* WordElement::spawnSimilarElement(int gazeX, int gazeY) {
 void WordElement::render() {
     if (loaded) {
         ofEnableAlphaBlending();
-        ofSetColor(0, 0, 0, 100);
+        ofSetColor(0, 0, 0, focusStarted ? 200 : 100);
         ofRectangle rect = font.getStringBoundingBox(word, x, y);
         float padding = 5;
         float expandedWidth =rect.width + padding * 2;
         float expandedHeight =rect.height + padding * 2;
         ofDrawRectangle(rect.x - padding, rect.y - padding, expandedWidth, expandedHeight);
         
-        ofSetColor(color);
+        ofSetColor(255);
         font.drawString(word, x, y);
         
     }

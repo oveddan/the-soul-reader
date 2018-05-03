@@ -34,7 +34,7 @@ void ofApp::setup(){
     int randomSaturation =std::round(ofRandom(100, 255));
     ofColor baseColor = ofColor::fromHsb(randomHue, randomSaturation, 255);
     
-    int numberOfColors = 3;
+    int numberOfColors = 2;
     
     for(int i = 0; i < numberOfColors; i++) {
         int newHue = randomHue + ( 255 / numberOfColors) * i;

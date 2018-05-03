@@ -161,7 +161,8 @@
 		A960CAC62099B0480007D0C8 /* focusBlur.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = focusBlur.frag; sourceTree = "<group>"; };
 		A960CAC72099B0480007D0C8 /* wood.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = wood.frag; sourceTree = "<group>"; };
 		A960CAC82099B0480007D0C8 /* wood.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = wood.vert; sourceTree = "<group>"; };
-		A960CACA209A23940007D0C8 /* focusCursor.frag */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = focusCursor.frag; sourceTree = "<group>"; };
+		A960CAD1209A63F70007D0C8 /* NewsCycle-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "NewsCycle-Bold.ttf"; path = "bin/data/fonts/NewsCycle-Bold.ttf"; sourceTree = SOURCE_ROOT; };
+		A960CAD2209A63F70007D0C8 /* NewsCycle-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "NewsCycle-Regular.ttf"; path = "bin/data/fonts/NewsCycle-Regular.ttf"; sourceTree = SOURCE_ROOT; };
 		A9C85208C7E45FB9D1926789 /* wimage.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = wimage.hpp; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv2/core/wimage.hpp; sourceTree = SOURCE_ROOT; };
 		AB2AE477F82ACF17D0121166 /* mat.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = mat.hpp; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv2/core/mat.hpp; sourceTree = SOURCE_ROOT; };
 		AE433383D6CA170C418C8A9E /* highgui_c.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = highgui_c.h; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv2/highgui/highgui_c.h; sourceTree = SOURCE_ROOT; };
@@ -534,10 +535,18 @@
 				A960CAC62099B0480007D0C8 /* focusBlur.frag */,
 				A960CAC72099B0480007D0C8 /* wood.frag */,
 				A960CAC82099B0480007D0C8 /* wood.vert */,
-				A960CACA209A23940007D0C8 /* focusCursor.frag */,
 			);
 			name = shaders;
 			path = bin/data/shaders;
+			sourceTree = "<group>";
+		};
+		A960CACB209A62550007D0C8 /* fonts */ = {
+			isa = PBXGroup;
+			children = (
+				A960CAD1209A63F70007D0C8 /* NewsCycle-Bold.ttf */,
+				A960CAD2209A63F70007D0C8 /* NewsCycle-Regular.ttf */,
+			);
+			path = fonts;
 			sourceTree = "<group>";
 		};
 		AAA97F42C2FE4A31ECFD0585 /* opencv */ = {
@@ -673,6 +682,7 @@
 		E4B69B4A0A3A1720003C02F2 = {
 			isa = PBXGroup;
 			children = (
+				A960CACB209A62550007D0C8 /* fonts */,
 				A960CAC52099B0480007D0C8 /* shaders */,
 				E4B6FCAD0C3E899E008CF71C /* openFrameworks-Info.plist */,
 				E4EB6923138AFD0F00A09F29 /* Project.xcconfig */,

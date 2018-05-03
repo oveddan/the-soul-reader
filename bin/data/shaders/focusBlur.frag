@@ -59,7 +59,7 @@ vec2 toRadialCoords(vec2 val, float scale) {
 
 float noisyWaveHeight(vec2 val) {
   vec2 xy = val - texCoordVarying;
-  return noise(toRadialCoords(xy, 1./20.) + sin(u_time / 3.));
+  return noise(toRadialCoords(xy, 1./20.) + sin(u_time / 2.) * cos(u_time / 2.));
 }
 
 vec2 noisyNormal(vec2 val) {
@@ -81,15 +81,15 @@ void main() {
     
     vec2 mousePct = u_mouse / u_resolution.xy;
     mousePct.y *= u_resolution.y/u_resolution.x;
-    float cursorStrength = smoothstep(.02 + u_totalFocusDuration / 30000., 0., length(mousePct - st));
+    float cursorStrength = smoothstep(.02 + u_totalFocusDuration / 20000., 0., length(mousePct - st));
     
-    float n = noise(toRadialCoords(texCoordVarying-u_mouse, 1./10.) + sin(u_time));
+    float n = noise(toRadialCoords(texCoordVarying-u_mouse, 1./10.) + sin(u_time * 2.));
     
     vec2 pos = texCoordVarying;
     
     vec3 src = texture(outputGraphic, pos + n * 10. * cursorStrength).rgb;
     
-    float cursorSize = pow(smoothstep(.02 + u_totalFocusDuration / 30000., 0., length(mousePct - st)), 2);
+    float cursorSize = pow(smoothstep(.02 + u_totalFocusDuration / 20000., 0., length(mousePct - st)), 2);
     
     float height =noisyWaveHeight(u_mouse);
     
