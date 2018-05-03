@@ -11,8 +11,6 @@ void ofApp::setup(){
     vidGrabber.setup(1920,1080);
     colorImg.allocate(1920,1080);
     
-    font.load("fonts/NewsCycle-Bold.ttf", 40);
-    
     
     //  context = zmqMakeContext(2);
     //  socket = zmqMakeSocket(*context, ZMQ_PUSH);
@@ -52,7 +50,7 @@ void ofApp::setup(){
         
         int wordX =ofRandom(0, ofGetWidth());
         int wordY = ofRandom(0, ofGetHeight());
-        Element* wordElement = new WordElement(color, wordX, wordY, font, "n10569926");
+        Element* wordElement = new WordElement(color, wordX, wordY, "n10569926");
         
         elements.push_back(wordElement);
     }

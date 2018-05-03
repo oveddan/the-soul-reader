@@ -87,7 +87,7 @@ ofColor getSimilarColor(ofColor color) {
     return newColor;
 }
 
-Element* ColorElement::spawnSimilarElement(int gazeX, int gazeY) {
+Element* spanColorElement(ofColor color, int gazeX, int gazeY) {
     int maxWidth = ofGetWidth() / 3;
     int maxHeight = ofGetHeight() / 3;
     
@@ -101,14 +101,38 @@ Element* ColorElement::spawnSimilarElement(int gazeX, int gazeY) {
     ofColor newColor = getSimilarColor(color);
     
     return new ColorElement(newColor, newX, newY, randomWidth, randomHeight);
+    
 }
 
-Element* WordElement::spawnSimilarElement(int gazeX, int gazeY) {
+Element* spanWordElement(ofColor color, int gazeX, int gazeY, string synsetKey) {
     int newX = findValidCoord(gazeX, ofGetWidth());
     int newY = findValidCoord(gazeY, ofGetHeight());
     ofColor newColor = getSimilarColor(color);
+    return new WordElement(newColor, newX, newY, synsetKey);
+}
 
-    return new WordElement(newColor, newX, newY, font, synsetKey);
+float probabilityDifferentWord = 0.1;
+
+bool shouldGetSomethingDifferent() {
+    float randomValue = ofRandom(0., 1.);
+    
+    return randomValue <= probabilityDifferentWord;
+}
+
+Element* ColorElement::spawnSimilarElement(int gazeX, int gazeY) {
+    
+    if(shouldGetSomethingDifferent()) {
+        return spanWordElement(color, gazeX, gazeY, "");
+    } else
+        return spanColorElement(color, gazeX, gazeY);
+}
+
+Element* WordElement::spawnSimilarElement(int gazeX, int gazeY) {
+
+    if(shouldGetSomethingDifferent()) {
+        return spanColorElement(color, gazeX, gazeY);
+    } else
+        return spanWordElement(color, gazeX, gazeY, synsetKey);
 }
 
 void WordElement::render() {
@@ -127,18 +151,24 @@ void WordElement::render() {
     }
 }
 
-float probabilityDifferentWord = 0.25;
-
 void WordElement::loadWord() {
-    float randomValue = ofRandom(0., 1.);
+    font.load("fonts/NewsCycle-Bold.ttf", 40);
     
-    if (randomValue <= probabilityDifferentWord) {
-        ofLoadURLAsync("http://localhost:5000/random_word",
-                       "async_req");
+    if (synsetKey == "" || shouldGetSomethingDifferent()) {
+        loadRandomWord();
     } else {
-        ofLoadURLAsync("http://localhost:5000/similar_word/" + similarWordSynsetKey,
-                       "async_req");
+        loadSimilarWord();
     }
+}
+
+void WordElement::loadSimilarWord() {
+    ofLoadURLAsync("http://localhost:5000/similar_word/" + similarWordSynsetKey,
+                   "async_req");
+}
+
+void WordElement::loadRandomWord() {
+    ofLoadURLAsync("http://localhost:5000/random_word",
+                   "async_req");
 }
 
 bool WordElement::intersects(int gazeX, int gazeY) {

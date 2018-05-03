@@ -55,9 +55,10 @@ protected:
 
 class WordElement: public Element {
 public:
-    WordElement(ofColor color, int cx, int cy, const ofTrueTypeFont font, const string similarWordSynsetKey) : color(color), font(font), similarWordSynsetKey(similarWordSynsetKey), loaded(false), Element(cx, cy) {
+    WordElement(ofColor color, int cx, int cy, const string similarWordSynsetKey) : color(color), similarWordSynsetKey(similarWordSynsetKey), loaded(false), Element(cx, cy) {
         
         ofRegisterURLNotification(this);
+       
         loadWord();
     }
     
@@ -67,6 +68,8 @@ public:
     bool intersects(int gazeX, int gazeY);
     
     void loadWord();
+    void loadRandomWord();
+    void loadSimilarWord();
     
     void urlResponse(ofHttpResponse & response);
     ~WordElement() {
@@ -80,7 +83,7 @@ protected:
     string word;
     string synsetKey;
     bool loaded;
-    const ofTrueTypeFont font;
+    ofTrueTypeFont font;
     
     const string similarWordSynsetKey;
 };

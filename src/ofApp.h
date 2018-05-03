@@ -24,6 +24,8 @@ public:
     void dragEvent(ofDragInfo dragInfo);
     void gotMessage(ofMessage msg);
     
+    void renderElement(Element* element);
+    
 protected:
     ofVideoGrabber vidGrabber;
     ofxCvColorImage            colorImg;
@@ -38,6 +40,4 @@ protected:
     
     ofFbo fboBlurOnePass;
     ofFbo fboBlurTwoPass;
-    
-    ofTrueTypeFont font;
 };
